@@ -7,7 +7,7 @@ const showOpenDialog = async (
   options: Electron.OpenDialogOptions
 ) => {
   if (WindowManager.mainWindow) {
-    return dialog.showOpenDialog(WindowManager.mainWindow, options);
+    return await dialog.showOpenDialog(WindowManager.mainWindow, options);
   }
 
   throw new Error("Main window is not available");

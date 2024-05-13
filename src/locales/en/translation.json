@@ -96,7 +96,15 @@
     "dont_show_it_again": "Don't show it again",
     "copy_to_clipboard": "Copy",
     "copied_to_clipboard": "Copied",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "game_executable_selection": {
+      "title": "Select the game executable file",
+      "executable_files": "Executable Files (.exe)",
+      "all_files": "All Files (.*)"
+    },
+    "download_path_selection": {
+      "title": "Select the download folder"
+    }
   },
   "activation": {
     "title": "Activate Hydra",
@@ -147,7 +155,10 @@
     "enable_real_debrid": "Enable Real Debrid",
     "real_debrid": "Real Debrid",
     "real_debrid_api_token_hint": "You can get your API key <0>here</0>.",
-    "save_changes": "Save changes"
+    "save_changes": "Save changes",
+    "download_path_selection": {
+      "title": "Select the downloads folder"
+    }
   },
   "notifications": {
     "download_complete": "Download complete",

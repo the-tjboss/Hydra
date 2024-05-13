@@ -46,12 +46,13 @@ export function SettingsGeneral({
   const { t } = useTranslation("settings");
 
   const handleChooseDownloadsPath = async () => {
-    const { filePaths } = await window.electron.showOpenDialog({
+    const { canceled, filePaths } = await window.electron.showOpenDialog({
+      title: t("download_path_selection.title"),
       defaultPath: form.downloadsPath,
       properties: ["openDirectory"],
     });
 
-    if (filePaths && filePaths.length > 0) {
+    if (!canceled) {
       const path = filePaths[0];
       updateUserPreferences({ downloadsPath: path });
     }
