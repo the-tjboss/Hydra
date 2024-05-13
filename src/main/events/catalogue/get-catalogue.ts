@@ -8,26 +8,10 @@ import { requestSteam250 } from "@main/services";
 
 const repacks = stateManager.getValue("repacks");
 
-const getStringForLookup = (index: number): string => {
-  const repack = repacks[index];
-  const formatter =
-    repackerFormatter[repack.repacker as keyof typeof repackerFormatter];
-
-  return formatName(formatter(repack.title));
-};
-
-const resultSize = 12;
-
 const getCatalogue = async (
   _event: Electron.IpcMainInvokeEvent,
   category: CatalogueCategory
 ) => {
-  if (!repacks.length) return [];
-
-  if (category === "trending") {
-    return getTrendingCatalogue(resultSize);
-  }
-
   return getRecentlyAddedCatalogue(resultSize);
 };
 
@@ -60,21 +44,6 @@ const getTrendingCatalogue = async (
   }
   return results;
 };
-
-const getRecentlyAddedCatalogue = async (
-  resultSize: number
-): Promise<CatalogueEntry[]> => {
-  const results: CatalogueEntry[] = [];
-
-  for (let i = 0; results.length < resultSize; i++) {
-    const stringForLookup = getStringForLookup(i);
-
-    if (!stringForLookup) {
-      i++;
-      continue;
-    }
-
-    const games = searchGames({ query: stringForLookup });
 
     for (const game of games) {
       const isAlreadyIncluded = results.some(
