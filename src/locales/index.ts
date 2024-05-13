@@ -10,4 +10,5 @@ export { default as ru } from "./ru/translation.json";
 export { default as tr } from "./tr/translation.json";
 export { default as be } from "./be/translation.json";
 export { default as uk } from "./uk/translation.json";
+export { default as zh } from "./zh/translation.json";
 export { default as id } from "./id/translation.json";
