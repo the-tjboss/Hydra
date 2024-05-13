@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 
-import { GameStatus } from "@main/constants";
+import { GameStatus } from "@shared";
 import { gameRepository } from "@main/repository";
 
 import { getDownloadsPath } from "../helpers/get-downloads-path";
@@ -11,18 +11,22 @@ import { registerEvent } from "../register-event";
 const deleteGameFolder = async (
   _event: Electron.IpcMainInvokeEvent,
   gameId: number
-) => {
+): Promise<void> => {
   const game = await gameRepository.findOne({
     where: {
       id: gameId,
       status: GameStatus.Cancelled,
+      isDeleted: false,
     },
   });
 
   if (!game) return;
 
   if (game.folderName) {
-    const folderPath = path.join(await getDownloadsPath(), game.folderName);
+    const folderPath = path.join(
+      game.downloadPath ?? (await getDownloadsPath()),
+      game.folderName
+    );
 
     if (fs.existsSync(folderPath)) {
       return new Promise((resolve, reject) => {
@@ -34,7 +38,8 @@ const deleteGameFolder = async (
               logger.error(error);
               reject();
             }
-            resolve(null);
+
+            resolve();
           }
         );
       });

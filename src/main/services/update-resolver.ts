@@ -1,14 +1,15 @@
 import path from "node:path";
 import { app } from "electron";
 
-import chunk from "lodash/chunk";
+import { chunk } from "lodash-es";
 
 import { createDataSource, dataSource } from "@main/data-source";
-import { Repack, RepackerFriendlyName } from "@main/entity";
+import { Repack, RepackerFriendlyName, SteamGame } from "@main/entity";
 import {
   migrationScriptRepository,
   repackRepository,
   repackerFriendlyNameRepository,
+  steamGameRepository,
 } from "@main/repository";
 import { MigrationScript } from "@main/entity/migration-script.entity";
 import { Like } from "typeorm";
@@ -108,18 +109,21 @@ export const resolveDatabaseUpdates = async () => {
   const updateDataSource = createDataSource({
     database: app.isPackaged
       ? path.join(process.resourcesPath, "hydra.db")
-      : path.join(__dirname, "..", "..", "resources", "hydra.db"),
+      : path.join(__dirname, "..", "..", "hydra.db"),
   });
 
   return updateDataSource.initialize().then(async () => {
     const updateRepackRepository = updateDataSource.getRepository(Repack);
     const updateRepackerFriendlyNameRepository =
       updateDataSource.getRepository(RepackerFriendlyName);
+    const updateSteamGameRepository = updateDataSource.getRepository(SteamGame);
 
-    const [updateRepacks, updateRepackerFriendlyNames] = await Promise.all([
-      updateRepackRepository.find(),
-      updateRepackerFriendlyNameRepository.find(),
-    ]);
+    const [updateRepacks, updateSteamGames, updateRepackerFriendlyNames] =
+      await Promise.all([
+        updateRepackRepository.find(),
+        updateSteamGameRepository.find(),
+        updateRepackerFriendlyNameRepository.find(),
+      ]);
 
     await runMigrationScripts(updateRepacks);
 
@@ -134,6 +138,17 @@ export const resolveDatabaseUpdates = async () => {
 
     for (const chunk of updateRepacksChunks) {
       await repackRepository
+        .createQueryBuilder()
+        .insert()
+        .values(chunk)
+        .orIgnore()
+        .execute();
+    }
+
+    const steamGamesChunks = chunk(updateSteamGames, 800);
+
+    for (const chunk of steamGamesChunks) {
+      await steamGameRepository
         .createQueryBuilder()
         .insert()
         .values(chunk)

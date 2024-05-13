@@ -1,21 +1,34 @@
-import { getSteamGameIconUrl, writePipe } from "@main/services";
-import { gameRepository, repackRepository } from "@main/repository";
-import { GameStatus } from "@main/constants";
+import { getSteamGameIconUrl } from "@main/services";
+import {
+  gameRepository,
+  repackRepository,
+  userPreferencesRepository,
+} from "@main/repository";
 
 import { registerEvent } from "../register-event";
 
 import type { GameShop } from "@types";
-import { getDownloadsPath } from "../helpers/get-downloads-path";
-import { getImageBase64 } from "@main/helpers";
+import { getFileBase64 } from "@main/helpers";
 import { In } from "typeorm";
+import { DownloadManager } from "@main/services";
+import { Downloader, GameStatus } from "@shared";
 
 const startGameDownload = async (
   _event: Electron.IpcMainInvokeEvent,
   repackId: number,
   objectID: string,
   title: string,
-  gameShop: GameShop
+  gameShop: GameShop,
+  downloadPath: string
 ) => {
+  const userPreferences = await userPreferencesRepository.findOne({
+    where: { id: 1 },
+  });
+
+  const downloader = userPreferences?.realDebridApiToken
+    ? Downloader.RealDebrid
+    : Downloader.Torrent;
+
   const [game, repack] = await Promise.all([
     gameRepository.findOne({
       where: {
@@ -29,15 +42,8 @@ const startGameDownload = async (
     }),
   ]);
 
-  if (!repack) return;
-
-  if (game?.status === GameStatus.Downloading) {
-    return;
-  }
-
-  writePipe.write({ action: "pause" });
-
-  const downloadsPath = game?.downloadPath ?? (await getDownloadsPath());
+  if (!repack || game?.status === GameStatus.Downloading) return;
+  DownloadManager.pauseDownload();
 
   await gameRepository.update(
     {
@@ -57,47 +63,33 @@ const startGameDownload = async (
       },
       {
         status: GameStatus.DownloadingMetadata,
-        downloadPath: downloadsPath,
+        downloadPath: downloadPath,
+        downloader,
         repack: { id: repackId },
+        isDeleted: false,
       }
     );
 
-    writePipe.write({
-      action: "start",
-      game_id: game.id,
-      magnet: repack.magnet,
-      save_path: downloadsPath,
-    });
+    DownloadManager.downloadGame(game.id);
 
     game.status = GameStatus.DownloadingMetadata;
 
-    writePipe.write({
-      action: "start",
-      game_id: game.id,
-      magnet: repack.magnet,
-      save_path: downloadsPath,
-    });
-
     return game;
   } else {
-    const iconUrl = await getImageBase64(await getSteamGameIconUrl(objectID));
+    const iconUrl = await getFileBase64(await getSteamGameIconUrl(objectID));
 
     const createdGame = await gameRepository.save({
       title,
       iconUrl,
       objectID,
+      downloader,
       shop: gameShop,
-      status: GameStatus.DownloadingMetadata,
-      downloadPath: downloadsPath,
+      status: GameStatus.Downloading,
+      downloadPath,
       repack: { id: repackId },
     });
 
-    writePipe.write({
-      action: "start",
-      game_id: createdGame.id,
-      magnet: repack.magnet,
-      save_path: downloadsPath,
-    });
+    DownloadManager.downloadGame(createdGame.id);
 
     const { repack: _, ...rest } = createdGame;
 

@@ -7,8 +7,10 @@ import {
   OneToOne,
   JoinColumn,
 } from "typeorm";
-import type { GameShop } from "@types";
 import { Repack } from "./repack.entity";
+
+import type { GameShop } from "@types";
+import { Downloader, GameStatus } from "@shared";
 
 @Entity("game")
 export class Game {
@@ -40,8 +42,14 @@ export class Game {
   shop: GameShop;
 
   @Column("text", { nullable: true })
-  status: string;
+  status: GameStatus | null;
 
+  @Column("int", { default: Downloader.Torrent })
+  downloader: Downloader;
+
+  /**
+   * Progress is a float between 0 and 1
+   */
   @Column("float", { default: 0 })
   progress: number;
 
@@ -60,6 +68,9 @@ export class Game {
   @OneToOne(() => Repack, { nullable: true })
   @JoinColumn()
   repack: Repack;
+
+  @Column("boolean", { default: false })
+  isDeleted: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

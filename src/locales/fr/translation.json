@@ -1,5 +1,5 @@
 {
-  "catalogue": {
+  "home": {
     "featured": "En vedette",
     "recently_added": "Récemment ajouté",
     "trending": "Tendance",
@@ -15,20 +15,23 @@
     "checking_files": "{{title}} ({{percentage}} - Vérification des fichiers…)",
     "paused": "{{title}} (En pause)",
     "downloading": "{{title}} ({{percentage}} - Téléchargement en cours…)",
-    "filter": "Filtrer la bibliothèque"
+    "filter": "Filtrer la bibliothèque",
+    "home": "Page d’accueil",
+    "follow_us": "Suivez-nous"
   },
   "header": {
     "search": "Recherche",
     "catalogue": "Catalogue",
     "downloads": "Téléchargements",
     "search_results": "Résultats de la recherche",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "home": "Accueil"
   },
   "bottom_panel": {
     "no_downloads_in_progress": "Aucun téléchargement en cours",
     "downloading_metadata": "Téléchargement des métadonnées de {{title}}…",
-    "checking_files": "Vérification des fichiers de {{title}}… ({{percentage}} complet)",
-    "downloading": "Téléchargement de {{title}}… ({{percentage}} complet) - Conclusion dans {{eta}} - {{speed}}"
+    "checking_files": "Vérification des fichiers de {{title}}… ({{percentage}} terminé)",
+    "downloading": "Téléchargement de {{title}}… ({{percentage}} terminé) - Fin dans {{eta}} - {{speed}}"
   },
   "game_details": {
     "open_download_options": "Ouvrir les options de téléchargement",
@@ -42,15 +45,15 @@
     "remove": "Supprimer",
     "remove_from_list": "Retirer",
     "space_left_on_disk": "{{space}} restant sur le disque",
-    "eta": "Conclusion dans {{eta}}",
+    "eta": "Fin dans {{eta}}",
     "downloading_metadata": "Téléchargement des métadonnées en cours…",
     "checking_files": "Vérification des fichiers…",
-    "filter": "Filtrer les réductions",
+    "filter": "Filtrer les repacks",
     "requirements": "Configuration requise",
     "minimum": "Minimum",
     "recommended": "Recommandée",
-    "no_minimum_requirements": "{{title}} ne fournit pas d'informations sur les exigences minimales",
-    "no_recommended_requirements": "{{title}} ne fournit pas d'informations sur les exigences recommandées",
+    "no_minimum_requirements": "{{title}} ne fournit pas d'informations sur les configurations minimales",
+    "no_recommended_requirements": "{{title}} ne fournit pas d'informations sur les configurations recommandées",
     "paused_progress": "{{progress}} (En pause)",
     "release_date": "Sorti le {{date}}",
     "publisher": "Édité par {{publisher}}",
@@ -58,6 +61,8 @@
     "copied_link_to_clipboard": "Lien copié",
     "hours": "heures",
     "minutes": "minutes",
+    "amount_hours": "{{amount}} heures",
+    "amount_minutes": "{{amount}} minutes",
     "accuracy": "{{accuracy}}% précision",
     "add_to_library": "Ajouter à la bibliothèque",
     "remove_from_library": "Supprimer de la bibliothèque",
@@ -65,24 +70,25 @@
     "next_suggestion": "Suggestion suivante",
     "play_time": "Joué pour {{montant}}",
     "install": "Installer",
-    "last_time_played": "Joué pour la dernière fois {{période}}",
     "play": "Jouer",
     "not_played_yet": "Vous n'avez pas encore joué à {{title}}",
     "close": "Fermer",
-    "deleting": "Suppression du programme d'installation…"
+    "deleting": "Suppression du programme d'installation…",
+    "playing_now": "Jeu en cours",
+    "last_time_played": "Dernièrement joué {{période}}"
   },
   "activation": {
     "title": "Activer Hydra",
     "installation_id": "ID d'installation :",
     "enter_activation_code": "Entrez votre code d'activation",
-    "message": "Si vous ne savez pas où demander cela, vous ne devriez pas l'avoir.",
+    "message": "Si vous ne savez pas où demander ceci, vous ne devriez pas l'avoir.",
     "activate": "Activer",
     "loading": "Chargement en cours…"
   },
   "downloads": {
     "resume": "Reprendre",
     "pause": "Pause",
-    "eta": "Conclusion dans {{eta}}",
+    "eta": "Fin dans {{eta}}",
     "paused": "En pause",
     "verifying": "Vérification en cours…",
     "completed_at": "Terminé en {{date}}",
@@ -107,14 +113,16 @@
     "change": "Mettre à jour",
     "notifications": "Notifications",
     "enable_download_notifications": "Quand un téléchargement est terminé",
-    "enable_repack_list_notifications": "Quand une nouvelle réduction est ajoutée"
+    "enable_repack_list_notifications": "Quand un nouveau repack est ajouté",
+    "telemetry": "Télémétrie",
+    "telemetry_description": "Activer les statistiques d'utilisation anonymes"
   },
   "notifications": {
     "download_complete": "Téléchargement terminé",
     "game_ready_to_install": "{{title}} est prêt à être installé",
-    "repack_list_updated": "Liste de réductions mise à jour",
-    "repack_count_one": "{{count}} réduction ajoutée",
-    "repack_count_other": "{{count}} réductions ajoutées"
+    "repack_list_updated": "Liste de repacks mise à jour",
+    "repack_count_one": "{{count}} repack ajouté",
+    "repack_count_other": "{{count}} repacks ajoutés"
   },
   "system_tray": {
     "open": "Ouvrir Hydra",
@@ -127,5 +135,9 @@
     "description": "Les exécutables Wine ou Lutris sont introuvables sur votre système",
     "instructions": "Vérifiez la bonne façon d'installer l'un d'entre eux sur votre distribution Linux afin que le jeu puisse fonctionner normalement",
     "title": "Programmes non installés"
+  },
+  "catalogue": {
+    "next_page": "Page suivante",
+    "previous_page": "Page précédente"
   }
 }

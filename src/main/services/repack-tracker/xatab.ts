@@ -1,16 +1,16 @@
 import { JSDOM } from "jsdom";
 
-import parseTorrent, { toMagnetURI } from "parse-torrent";
-
 import { Repack } from "@main/entity";
 import { logger } from "../logger";
 import { requestWebPage, savePage } from "./helpers";
-import type { GameRepackInput } from "./helpers";
 
-const getTorrentBuffer = (url: string) =>
-  fetch(url, { method: "GET" }).then((response) =>
-    response.arrayBuffer().then((buffer) => Buffer.from(buffer))
-  );
+import createWorker from "@main/workers/torrent-parser.worker?nodeWorker";
+import { toMagnetURI } from "parse-torrent";
+import type { Instance } from "parse-torrent";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { formatBytes } from "@shared";
+
+const worker = createWorker({});
 
 const formatXatabDate = (str: string) => {
   const date = new Date();
@@ -25,31 +25,32 @@ const formatXatabDate = (str: string) => {
   return date;
 };
 
-const formatXatabDownloadSize = (str: string) =>
-  str.replace(",", ".").replace(/Гб/g, "GB").replace(/Мб/g, "MB");
+const getXatabRepack = (
+  url: string
+): Promise<{ fileSize: string; magnet: string; uploadDate: Date }> => {
+  return new Promise((resolve) => {
+    (async () => {
+      const data = await requestWebPage(url);
+      const { window } = new JSDOM(data);
+      const { document } = window;
 
-const getXatabRepack = async (url: string) => {
-  const data = await requestWebPage(url);
-  const { window } = new JSDOM(data);
+      const $uploadDate = document.querySelector(".entry__date");
 
-  const $uploadDate = window.document.querySelector(".entry__date");
-  const $size = window.document.querySelector(".entry__info-size");
+      const $downloadButton = document.querySelector(
+        ".download-torrent"
+      ) as HTMLAnchorElement;
 
-  const $downloadButton = window.document.querySelector(
-    ".download-torrent"
-  ) as HTMLAnchorElement;
+      if (!$downloadButton) throw new Error("Download button not found");
 
-  if (!$downloadButton) throw new Error("Download button not found");
-
-  const torrentBuffer = await getTorrentBuffer($downloadButton.href);
-
-  return {
-    fileSize: formatXatabDownloadSize($size.textContent).toUpperCase(),
-    magnet: toMagnetURI({
-      infoHash: parseTorrent(torrentBuffer).infoHash,
-    }),
-    uploadDate: formatXatabDate($uploadDate.textContent),
-  };
+      worker.once("message", (torrent: Instance) => {
+        resolve({
+          fileSize: formatBytes(torrent.length ?? 0),
+          magnet: toMagnetURI(torrent),
+          uploadDate: formatXatabDate($uploadDate!.textContent!),
+        });
+      });
+    })();
+  });
 };
 
 export const getNewRepacksFromXatab = async (
@@ -60,7 +61,7 @@ export const getNewRepacksFromXatab = async (
 
   const { window } = new JSDOM(data);
 
-  const repacks: GameRepackInput[] = [];
+  const repacks: QueryDeepPartialEntity<Repack>[] = [];
 
   for (const $a of Array.from(
     window.document.querySelectorAll(".entry__title a")
@@ -69,19 +70,20 @@ export const getNewRepacksFromXatab = async (
       const repack = await getXatabRepack(($a as HTMLAnchorElement).href);
 
       repacks.push({
-        title: $a.textContent,
+        title: $a.textContent!,
         repacker: "Xatab",
         ...repack,
         page,
       });
-    } catch (err) {
-      logger.error(err.message, { method: "getNewRepacksFromXatab" });
+    } catch (err: unknown) {
+      logger.error((err as Error).message, {
+        method: "getNewRepacksFromXatab",
+      });
     }
   }
 
   const newRepacks = repacks.filter(
     (repack) =>
-      repack.uploadDate &&
       !existingRepacks.some(
         (existingRepack) => existingRepack.title === repack.title
       )
