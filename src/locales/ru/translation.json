@@ -97,7 +97,9 @@
     "dont_show_it_again": "Не показывать снова",
     "copy_to_clipboard": "Копировать",
     "copied_to_clipboard": "Скопировано",
-    "got_it": "Понятно"
+    "got_it": "Понятно",
+    "multi_language": "Мультиязычный",
+    "multiplayer": "Многопользовательский"
   },
   "activation": {
     "title": "Активировать Hydra",

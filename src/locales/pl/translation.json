@@ -83,7 +83,9 @@
     "downloads_path": "Ścieżka pobierania",
     "select_folder_hint": "Aby zmienić domyślny folder, przejdź do",
     "settings": "Ustawienia Hydra",
-    "download_now": "Pobierz teraz"
+    "download_now": "Pobierz teraz",
+    "multi_language": "Wielojęzyczny",
+    "multiplayer": "Wieloosobowy"
   },
   "activation": {
     "title": "Aktywuj Hydra",
